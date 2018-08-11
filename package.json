@@ -1,0 +1,23 @@
+{
+  "name": "tap-connect-server",
+  "version": "0.0.1",
+  "description": "",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Bennie van der Wel",
+  "license": "ISC",
+  "dependencies": {
+    "apollo-server": "^2.0.0",
+    "apollo-server-express": "^2.0.0",
+    "bcryptjs": "^2.4.3",
+    "dotenv": "^6.0.0",
+    "express": "^4.16.3",
+    "graphql": "^0.13.2",
+    "jsonwebtoken": "^8.3.0",
+    "mongoose": "^5.2.7",
+    "nodemon": "^1.18.3",
+    "validator": "^10.5.0"
+  }
+}
