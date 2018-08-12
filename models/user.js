@@ -21,10 +21,6 @@ const userSchema = new mongoose.Schema({
     required: true,
     select: false
   },
-  tokens: [{
-      type: String,
-      required: true
-  }],
   roles: [{
       type: String,
       required: true,
@@ -32,26 +28,16 @@ const userSchema = new mongoose.Schema({
         validator: value => Object.keys(enums.UserRoles).includes(value),
         message: '{VALUE} is not a valid user role'
       }
-  }]  
+  }],
+  friends: [{
+    type: String,
+    required: true,
+  }]
 });
 
 // =============
 // Class methods
 // =============
-
-/**
- * Find a user based on an access token
- * @param {String} token The access token to find the user by 
- * @returns {Promise} Will resolve with a user object
- */
-userSchema.statics.findByToken = function(token) {
-  const User = this;
-
-  return User.findOne({ 
-    _id: JWT.verify(token, 'adfaasfda'),
-    tokens: token
-  });
-};
 
 /**
  * If user is an admin, create a new user
@@ -94,6 +80,36 @@ userSchema.methods.verifyPassword = function(password) {
   const user = this;
 
   return bcrypt.compare(password, user.password);
+};
+
+/**
+ * Add a new user id to friends
+ * @param {String} email The email of the friend to be added 
+ */
+userSchema.methods.addFriend = function(email) {
+  const user = this;
+  
+  return User.findOne({ email }).then(friend => {
+    if (friend) {
+      if (!user.friends.includes(friend.id)) {
+        user.friends = user.friends.concat(friend.id);
+        return user.save();
+      } else {
+        return user;
+      }
+    } else {
+      return Promise.reject('No users found for that email');
+    }
+  });
+};
+
+/**
+ * Get all the friend user objects
+ */
+userSchema.methods.getFriends = function() {
+  const user = this;
+
+  return User.find({ '_id': { $in: user.friends }})
 };
 
 /**

@@ -24,17 +24,15 @@ const typeDefs = gql`
   type User {
     _id: String
     email: String,
-    password: String,
-    tokens: [String]
+    friends: [String]
   }
 
   type Query {
     """
     Get all users
     """
-    user(id: Int!): User
-    users: [User]
     getCurrentUser: User
+    getFriends: [User]
   }
 
   type Mutation {
@@ -42,37 +40,22 @@ const typeDefs = gql`
     Create a new user
     """
     createUser(email: String, password: String): User
-    loginUser(email: String, password: String): String
+    addFriend(email: String): User
   }
 `;
 
 // Setup resolvers
 const resolvers = {
   Query: {
-    user: (root, { id }) => User.findById(id).then(user => user),
-    users: () => User.find().then(users => users),
-    getCurrentUser: (root, args, context) => {
-      return context.user;
-    }
+    getCurrentUser: (root, args, context) => context.user,
+    getFriends: (root, { ids }, { user }) => user.getFriends()
   },
   Mutation: {
-    createUser: (root, { email, password }) => {
-      return User.createUser(email, password).then(user => user);
+    createUser: async (root, { email, password }) => {
+      return User.createUser(email, password);
     },
-    loginUser: async (root, { email, password }) => {
-      const user = await User.findOne({ email });
-      if (!user) {
-        throw new Error('No iser found')
-      }
-
-      const valid = await bcrypt.compare(password, user.password);
-      if (!valid) {
-        throw new Error('Not a valid password')
-      }
-
-      const token = await user.generateAuthToken();
-
-      return token;
+    addFriend: (root, { email }, context) => {
+      return context.user.addFriend(email);
     }
   }
 }
@@ -104,7 +87,7 @@ expressServer.all('/grapql', (req, res, next) => {
           // If the token is valid, fetch the user object and 
           // place it on the request
           User.findOne({ _id: data.userId }, (err, user) => {
-            req.user = user.toJSON();
+            req.user = user;
             next();
           });
         } else {
