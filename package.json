@@ -18,6 +18,7 @@
     "jsonwebtoken": "^8.3.0",
     "mongoose": "^5.2.7",
     "nodemon": "^1.18.3",
+    "prettier": "~1.14",
     "validator": "^10.5.0"
   }
 }

@@ -25,6 +25,7 @@ const typeDefs = gql`
     _id: String
     email: String,
     friends: [String]
+    username: String
   }
 
   type Query {
@@ -39,7 +40,11 @@ const typeDefs = gql`
     """
     Create a new user
     """
-    createUser(email: String, password: String): User
+    createUser(
+      email: String, 
+      password: String, 
+      username: String
+      ): User
     addFriend(email: String): User
   }
 `;
@@ -51,8 +56,8 @@ const resolvers = {
     getFriends: (root, { ids }, { user }) => user.getFriends()
   },
   Mutation: {
-    createUser: async (root, { email, password }) => {
-      return User.createUser(email, password);
+    createUser: async (root, { email, password, username }, { user }) => {
+      return User.createUser(email, password, username, user)
     },
     addFriend: (root, { email }, context) => {
       return context.user.addFriend(email);
