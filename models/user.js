@@ -108,6 +108,10 @@ userSchema.methods.addFriend = function(email) {
     if (friend) {
       if (!user.friends.includes(friend.id)) {
         user.friends = user.friends.concat(friend.id)
+
+        // Create a chat between the users
+        const chat = new chat({ users: [friend.id, user.id] }).save()
+
         return user.save()
       } else {
         return user
