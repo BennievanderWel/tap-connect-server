@@ -84,17 +84,32 @@ userSchema.statics.createUser = function(email, password, username, requestingUs
  */
 userSchema.methods.generateAuthToken = function() {
   // TODO: Set expiration time on token and figure out what the
-  // TODO: best solution ins wrt refeshing a token
+  // TODO: best solution is wrt refeshing a token
 
   const user = this
-  console.log(user)
-  return JWT.sign({ userId: user._id }, process.env.SECRET_KEY)
+
+  return JWT.sign(
+    {
+      data: { userId: user._id }
+    },
+    process.env.SECRET_KEY
+  )
 }
 
 userSchema.methods.verifyPassword = function(password) {
   const user = this
 
   return bcrypt.compare(password, user.password)
+}
+
+/**
+ * Add a new chat
+ * @param {Array} userIds List of ids of the users in the chat
+ * @param {String} title The title of the chat if there are
+ * more than one user besides the requesting user
+ */
+userSchema.methods.addChat = function(userIds, title = null) {
+  const user = this
 }
 
 /**
